@@ -5,10 +5,10 @@ author: "Feng Qiu"
 date: "Sept. 17, 2019"
 output: 
   html_document:
-    code_folding: hide
+    toc: True
 ---
 
-```{r,warning=FALSE,message=FALSE}
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
 library(data.table)
 library(tidyverse)
 library(tidytext)
@@ -30,7 +30,7 @@ In the following article, we will use some plots to see these changes and differ
 
 It is quite obvious and resonable if one assume people's taste to music can change with times just as their attitudes to the fashion. Such change can be indidcated by the proportion of different genres amoung all published songs in different years or decades. The genre with higher proportion tends to be more likely accepted by community.
 
-```{r}
+```{r,echo=FALSE}
 # load data
 load('C:/Users/AshChiVoo/Documents/GitHub/fall2019-proj1--jevousvois/output/processed_lyrics.RData') 
 
@@ -64,7 +64,7 @@ Secondly, the number of songs in different genres published changes quite a lot.
 
 But how does it happen? Why do genres such as Hip-Hop and Pop become more popular these days? Is it because of the theme of these gernes are more connected to the modern world? Therefore, we are going to use wordcloud to compare the theme of songs published in early years and recent years.
 
-```{r, fig.cap="Figure: Most frequent words in lyrics before 2000s"}
+```{r, fig.cap="Figure: Most frequent words in lyrics before 2000s",,echo=FALSE}
 # lyrics before 2000
 lyrics_b2000 <- Lyrics %>%
                 filter(year < 2000) %>%
@@ -86,7 +86,7 @@ wordcloud2(lyrics_b2000,
            rotateRatio = .5,
            shape = "circle")
 ```
-```{r,fig.cap="Figure: Most frequent words in lyrics after 2000s"}
+```{r,fig.cap="Figure: Most frequent words in lyrics after 2000s",,echo=FALSE}
 # lyrics after 2000
 lyrics_a2000 <- Lyrics %>%
                 filter(year >2009) %>%
@@ -118,7 +118,7 @@ Apart from the similarity of lyrics mentioned above, there are also differences 
 
 Therefore, what is the theme of these three rapidly developed genres? And why don't we just focus on the published ones in recent years?
 
-```{r, fig.align='center'}
+```{r, fig.align='center',,echo=FALSE}
 # hip-hop, pop and electronic lyrics
 lyrics_3g <-  Lyrics %>%
                 filter(genre == "Hip-Hop" | genre == "Pop" | genre =="Electronic") %>%
@@ -151,7 +151,7 @@ Maybe the popularizaiton of these genres are the sentiments they show. Maybe peo
 
 To verify the conjecture at the end of the last section, sentiment analysis is going to be applied. We are going to use `NRC` lexicon for sentiment analysis. To be noted, sentiment analysis is highly affected by the comprehensiveness of the lexicon.
 
-```{r,warning=FALSE,message=FALSE,fig.align='center'}
+```{r,warning=FALSE,message=FALSE,fig.align='center',,echo=FALSE}
 # all stemmedword w.r.t genres
 lyrics_genre <-  Lyrics %>%
                   select(genre, stemmedwords) %>%
