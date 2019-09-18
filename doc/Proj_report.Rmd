@@ -16,8 +16,9 @@ library(ggmosaic)
 library(tm)
 library(wordcloud2)
 library(d3heatmap)
-library(topicmodels)
 ```
+
+![](C:\Users\AshChiVoo\Documents\GitHub\fall2019-proj1--jevousvois\figs\title.png)
 
 ## Introduction
 
@@ -80,7 +81,7 @@ lyrics_b2000 <- Lyrics %>%
 wordcloud2(lyrics_b2000,
            color = "random-light",
            backgroundColor = "dark",
-           size=1,
+           size=.75,
            minRotation = pi/2,
            maxRotation = pi/2,
            rotateRatio = .5,
@@ -179,6 +180,8 @@ for (i in 1:nrow(S.G.mtx)){
       colSums()
   }
 }
+# scale with respect to the number of sentiments word. 
+# get rid of the number effect on heatmap.
 S.G.mtx <- apply(S.G.mtx,1,function(x){return(x/sum(x))}) %>% t()
 
 #heatmap
