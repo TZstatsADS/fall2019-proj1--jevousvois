@@ -24,7 +24,7 @@ From the packages' descriptions:
 + `data.table` is a package for fast aggregation of large data;
 + `wordcloud2` provides an HTML5 interface to wordcloud for data visualization;
 + `gridExtra` contains miscellaneous functions for "grid" graphics;
-+ `ngram` is for constructing n-grams (“tokenizing”), as well as generating new text based on the n-gram structure of a given text input (“babbling”);
++ `ngram` is for constructing n-grams ("tokenizing"), as well as generating new text based on the n-gram structure of a given text input ("babbling");
 + `Shiny` is an R package that makes it easy to build interactive web apps straight from R;
 
 ```{r load libraries, warning=FALSE, message=FALSE}
@@ -48,9 +48,9 @@ We use the processed data and artist information for our analysis.
 
 ```{r load data, warning=FALSE, message=FALSE}
 # load lyrics data
-load('../output/processed_lyrics.RData') 
+load('C:/Users/AshChiVoo/Documents/GitHub/fall2019-proj1--jevousvois/output/processed_lyrics.RData') 
 # load artist information
-dt_artist <- fread('../data/artists.csv') 
+dt_artist <- fread('C:/Users/AshChiVoo/Documents/GitHub/fall2019-proj1--jevousvois/data/artists.csv') 
 ```
 
 ### Preparations for visualization

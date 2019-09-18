@@ -1,0 +1,201 @@
+---
+title: "The Trend of Music Genre"
+subtitle: "Does people's music taste change?"
+author: "Feng Qiu"
+date: "Sept. 17, 2019"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r,warning=FALSE,message=FALSE}
+library(data.table)
+library(tidyverse)
+library(tidytext)
+library(ggmosaic)
+library(tm)
+library(wordcloud2)
+library(d3heatmap)
+library(topicmodels)
+```
+
+## Introduction
+
+With the popularization of the social meida especially the internet in recent year, music industry seems to benifits alot. The development in music is significant which is repreneted not only by the increasing number of published songs but also by the diverse lyrics in recent years.  
+
+In the following article, we will use some plots to see these changes and differences in detail. To be more specific, the mosaic plot will be introduced to show the different music genre in different decades from 1970s to 2010s. Then, some wordclouds will be shown to indicate the most mentioned words in music lyrics. Lastly, a heatmap is used for sentiment analysis.
+
+
+## Change in Community's Taste
+
+It is quite obvious and resonable if one assume people's taste to music can change with times just as their attitudes to the fashion. Such change can be indidcated by the proportion of different genres amoung all published songs in different years or decades. The genre with higher proportion tends to be more likely accepted by community.
+
+```{r}
+# load data
+load('C:/Users/AshChiVoo/Documents/GitHub/fall2019-proj1--jevousvois/output/processed_lyrics.RData') 
+
+# adding Decades variable 
+Lyrics <- dt_lyrics %>% 
+  filter(genre != "Not Available" & genre != "Other") %>%
+  mutate(Decades = case_when(year <= 2019 & year >= 2010 ~ "2010s",
+                                                   year <= 2009 & year >= 2000 ~ "2000s",
+                                                   year <= 1999 & year >= 1990 ~ "1990s",
+                                                   year <= 1989 & year >= 1980 ~ "1980s",
+                                                   year <= 1979 ~ "1970s"))
+
+# mosaic plotting
+
+ggplot(data = Lyrics) + geom_mosaic(aes(x = product(genre,Decades), fill = genre)) + 
+  theme(axis.text.x = element_text(vjust = 0, angle = 60)) + 
+  theme(axis.text.y = element_text(size = 5)) +
+  labs(title = "Music Genre in Decades", xlab= "", ylab = "")+
+  labs(x = NULL, y = NULL) + 
+  theme(axis.text.x = element_text(size = 5, angle = 35))
+```
+
+According to the mosaic plot show above, there are two appearant patterns related to the industry.
+
+Fisrtly, the booming development in the music industry in recent 20 years can be verified, especially in 2000s. This is indcated by the width standing for the number of songs published in the corresponding years of the differnet decades. The songs in published in 2000s is far more than songs in former 20 years. However, the dataset only contains the songs before 2017, which might be one of the reasons that 2010s has a more narrow bar.
+
+Secondly, the number of songs in different genres published changes quite a lot. In some sense, this reflects that the taste of the community to the music also changes with respect to years. If we focus on the proportion of genres in the same decades, Rock music is definately the most popular genre. However, things might change in future since the Rock's proportion shirnks with years while Hip-Hop, Pop and Electronic music becomes more popular than before. This also indicates that people's taste to music genres become more diverse than before.
+
+
+## Theme of Music
+
+But how does it happen? Why do genres such as Hip-Hop and Pop become more popular these days? Is it because of the theme of these gernes are more connected to the modern world? Therefore, we are going to use wordcloud to compare the theme of songs published in early years and recent years.
+
+```{r, fig.cap="Figure: Most frequent words in lyrics before 2000s"}
+# lyrics before 2000
+lyrics_b2000 <- Lyrics %>%
+                filter(year < 2000) %>%
+                select(stemmedwords) %>% 
+                VectorSource() %>%
+                Corpus() %>%
+                TermDocumentMatrix() %>%
+                tidy() %>%
+                filter(count > 50) %>%
+                group_by(term) %>%
+                summarise(sum(count))
+
+wordcloud2(lyrics_b2000,
+           color = "random-light",
+           backgroundColor = "dark",
+           size=1,
+           minRotation = pi/2,
+           maxRotation = pi/2,
+           rotateRatio = .5,
+           shape = "circle")
+```
+```{r,fig.cap="Figure: Most frequent words in lyrics after 2000s"}
+# lyrics after 2000
+lyrics_a2000 <- Lyrics %>%
+                filter(year >2009) %>%
+                select(stemmedwords) %>% 
+                VectorSource() %>%
+                Corpus() %>%
+                TermDocumentMatrix() %>%
+                tidy() %>%
+                filter(count > 50) %>%
+                group_by(term) %>%
+                summarise(sum(count))
+
+wordcloud2(lyrics_a2000,
+           color = "random-light",
+           backgroundColor = "dark",
+           size=0.75,
+           minRotation = pi/2,
+           maxRotation = pi/2,
+           rotateRatio = .5,
+           shape = "circle")
+
+```
+
+The first wordcloud shows the words appears most frequently in published songs before 2000s and th second wordcloud shows the case after 2010s.
+
+From the two wordclounds, appearantly, the main theme for music does not change with years. Since "Love" is one of the mostly mentioned word in the songs before 2000s and after 2000s. It is reasonable to conclude that most songs published may be related to the theme "Love". Additonaly, words such as "baby", "time" and "world" are also popular theme or words apprear in lyrics in these two periods.
+
+Apart from the similarity of lyrics mentioned above, there are also differences and changes with years in lyrics. Compared with the lyrics before 2000s, lyrics after 2000s become much more diverse. The coummunity might be tired of the dullness of some specific theme. Maybe they are waiting for the songs with different theme or genres with diverse topics. The increasing words contained in the lyrics which might be caused by the increasing number in publised genre such as Hip-Hop, Pop and Electronic that we mentioned at the very beginnnig of this article. 
+
+Therefore, what is the theme of these three rapidly developed genres? And why don't we just focus on the published ones in recent years?
+
+```{r, fig.align='center'}
+# hip-hop, pop and electronic lyrics
+lyrics_3g <-  Lyrics %>%
+                filter(genre == "Hip-Hop" | genre == "Pop" | genre =="Electronic") %>%
+                select(stemmedwords) %>% 
+                VectorSource() %>%
+                Corpus() %>%
+                TermDocumentMatrix() %>%
+                tidy() %>%
+                filter(count >= 50) %>%
+                group_by(term) %>%
+                summarise(sum(count))
+
+wordcloud2(lyrics_3g,
+           color = "random-light",
+           backgroundColor = "dark",
+           size=0.75,
+           minRotation = pi/2,
+           maxRotation = pi/2,
+           rotateRatio = .5,
+           shape = "circle")
+
+```
+
+From the wordcloud of these three genres, indeed there are many differnt words in lyrics. Words such as "love", "time", "baby" and "girl" are also most appeared words in the three genres. Apart from these, some indecent and inappropriate words appears quite often in lyrics of these genres. 
+
+Maybe the popularizaiton of these genres are the sentiments they show. Maybe people tend to listen to this songs as a way to help themseleves release their stress.
+
+
+## Sentiment Analysis
+
+To verify the conjecture at the end of the last section, sentiment analysis is going to be applied. We are going to use `NRC` lexicon for sentiment analysis. To be noted, sentiment analysis is highly affected by the comprehensiveness of the lexicon.
+
+```{r,warning=FALSE,message=FALSE,fig.align='center'}
+# all stemmedword w.r.t genres
+lyrics_genre <-  Lyrics %>%
+                  select(genre, stemmedwords) %>%
+                  unnest_tokens(word,stemmedwords)
+# nrc lexion
+NRC <- get_sentiments("nrc")
+
+# all genres
+Genre <- lyrics_genre %>% select(genre) %>% unique() %>% pull() 
+# sentiment labels
+Sentiment <- NRC %>% select(sentiment) %>% unique() %>% pull()
+# Sentiment.Genre matrix containing word count for corresponding two variables
+S.G.mtx <- matrix(0,ncol = length(Genre),nrow = length(Sentiment))
+rownames(S.G.mtx) <- Genre
+colnames(S.G.mtx) <- Sentiment
+# Counting process
+for (i in 1:nrow(S.G.mtx)){
+  NRC_i <- NRC %>% filter(sentiment == Sentiment[i])
+  for (j in 1:ncol(S.G.mtx)){
+    S.G.mtx[j,i] <- lyrics_genre %>% 
+      filter(genre == Genre[j]) %>% 
+      inner_join(NRC_i) %>% 
+      count(word) %>% 
+      select(n) %>% 
+      colSums()
+  }
+}
+S.G.mtx <- apply(S.G.mtx,1,function(x){return(x/sum(x))}) %>% t()
+
+#heatmap
+d3heatmap(S.G.mtx,scale="none",colors= "Reds",
+          Rowv = FALSE,Colv = FALSE,
+          xaxis_font_size = "14px",yaxis_font_size = "14px")
+```
+
+Shown by the plot above, the color that is more red indicates the corresponding sentiment is much stronger. 
+
+Obviously, most music shows the positiveness and joy in lyrics to the community, especially Jazz. While the number of songs shows surprise is quite few. 
+
+Different from most genres, Hip-Hop shows more negativeenss than other feelings. Words related to anger apears more frequently in Hip-Hop lyrics than other genres'. Metal music is another uncommon genre. It tends to reflects more frequently in negative emotions such as fear and sadness. 
+
+
+## Conclusion
+
+Genearlly, the music industry developed rapidly in recent years, especially in 2000s and such trend will continue in future. People's diverse attitude to different genres maybe one of the reason of this. 
+
+Also, the taste of the community to gernes can be differnent in different decades. Therefore, the themes of recently publised songs become more diverse than ones in decades ago. Especially, Hip-Hop, as one of the most popular music genre in recent years, is welcomed which might be the result of the fact that its lyrics with opposite sentiments to other genres.
